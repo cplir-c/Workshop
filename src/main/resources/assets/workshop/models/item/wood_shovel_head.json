@@ -6,13 +6,13 @@
   "overrides": [
     {
       "predicate": {
-        "binding": 1
+        "workshop:binding": 1
       },
       "model": "workshop:item/wood_shovel_head_vine_rope"
     },
     {
       "predicate": {
-        "binding": 2
+        "workshop:binding": 2
       },
       "model": "workshop:item/wood_shovel_head_silk_rope"
     }
