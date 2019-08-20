@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "workshop:item/wood_handle_silk_rope"
+  }
+}

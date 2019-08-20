@@ -1,16 +1,12 @@
-# Fabric Example Mod
+<img src="icon.png" align="right" width="180px"/>
 
-## Setup
+# Workshop
 
-1. Edit build.gradle and mod.json to suit your needs.
-    * The "mixins" object can be removed from mod.json if you do not need to use mixins.
-    * Please replace all occurences of "modid" with your own mod ID - sometimes, a different string may also suffice.
-2. Run the following command:
 
-```
-./gradlew idea
-```
+[>> Downloads <<](https://github.com/CottonMC/Workshop/releases)
 
-## License
+*Let's get to work!*
 
-This template is available under the CC0 license. Feel free to learn from it and incorporate it in your own projects.
+**This mod is open source and under a permissive license.** As such, it can be included in any modpack on any platform without prior permission. We appreciate hearing about people using our mods, but you do not need to ask to use them. See the [LICENSE file](LICENSE) for more details.
+
+Workshop is a total-conversion mod for Fabric, It seeks to rennovate the early game and add new, fun crafting mechanics that are more intuitive and engaging for creating tools, armor, and weapons.

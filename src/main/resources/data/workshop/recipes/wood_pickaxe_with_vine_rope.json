@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  _",
+    " S ",
+    "/  "
+  ],
+  "key": {
+    "_": {
+      "item": "workshop:wood_pickaxe_head"
+    },
+    "S": {
+      "item": "workshop:vine_rope"
+    },
+    "/": {
+      "item": "workshop:wood_handle"
+    }
+  },
+  "result": {
+    "item": "workshop:wood_pickaxe",
+    "count": 1,
+    "data": {
+      "Binding": "vine"
+    }
+  }
+}

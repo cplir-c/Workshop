@@ -1,0 +1,20 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "workshop:item/wood_handle_grass_rope"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "binding": 1
+      },
+      "model": "workshop:item/wood_handle_vine_rope"
+    },
+    {
+      "predicate": {
+        "binding": 2
+      },
+      "model": "workshop:item/wood_handle_silk_rope"
+    }
+  ]
+}

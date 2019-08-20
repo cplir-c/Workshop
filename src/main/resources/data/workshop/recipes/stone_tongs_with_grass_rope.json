@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " # ",
+    "/S#",
+    " / "
+  ],
+  "key": {
+    "#": {
+      "item": "workshop:rock_chunk"
+    },
+    "/": {
+      "item": "workshop:wood_handle"
+    },
+    "S": {
+      "item": "workshop:grass_rope"
+    }
+  },
+  "result": {
+    "item": "minecraft:wooden_pickaxe",
+    "count": 1,
+    "data": {
+      "Binding": "grass"
+    }
+  }
+}

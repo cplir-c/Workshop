@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "workshop:grass_blades"
+    }
+  },
+  "result": {
+    "item": "workshop:grass_rope",
+    "count": 1
+  }
+}
