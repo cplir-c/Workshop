@@ -4,26 +4,26 @@ import io.github.cottonmc.workshop.Workshop;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.loot.v1.FabricLootPoolBuilder;
 import net.fabricmc.fabric.api.loot.v1.event.LootTableLoadingCallback;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ToolMaterials;
+import net.minecraft.item.*;
+import net.minecraft.predicate.item.ItemPredicate;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.loot.UniformLootTableRange;
+import net.minecraft.world.loot.condition.InvertedLootCondition;
+import net.minecraft.world.loot.condition.MatchToolLootCondition;
 import net.minecraft.world.loot.entry.ItemEntry;
 
 public class WorkshopItems {
 
 	//raw materials
 	public static Item GRASS_BLADES;
+	public static Item VINE_BUNDLE;
 	public static Item ROCK_CHUNK;
 	public static Item CLAY_BLOB;
 
 	//semi-processed materials
 	public static Item GRASS_ROPE;
 	public static Item VINE_ROPE;
-	public static Item VINE_BUNDLE;
 
 	//tool ingredients
 	public static Item WOOD_HANDLE;
@@ -45,12 +45,12 @@ public class WorkshopItems {
 
 	public static void init() {
 		GRASS_BLADES = register("grass_blades", new Item(defaultSettings()));
+		VINE_BUNDLE = register("vine_bundle", new Item(defaultSettings()));
 		ROCK_CHUNK = register("rock_chunk", new Item(defaultSettings()));
 		CLAY_BLOB = register("clay_blob", new Item(defaultSettings()));
 
 		GRASS_ROPE = register("grass_rope", new Item(defaultSettings()));
 		VINE_ROPE = register("vine_rope", new Item(defaultSettings()));
-		VINE_BUNDLE = register("vine_bundle", new Item(defaultSettings()));
 
 		//TODO: enchantability?
 		WOOD_HANDLE = register("wood_handle", new BoundItem(defaultSettings()));
@@ -69,8 +69,16 @@ public class WorkshopItems {
 		LootTableLoadingCallback.EVENT.register(((resourceManager, lootManager, id, supplier, lootTableSetter) -> {
 			if (id.equals(new Identifier("minecraft", "blocks/grass"))) {
 				FabricLootPoolBuilder builder = FabricLootPoolBuilder.builder()
-						.withRolls(UniformLootTableRange.between(1, 3))
-						.withEntry(ItemEntry.builder(GRASS_BLADES));
+						.withRolls(UniformLootTableRange.between(0, 2))
+						.withEntry(ItemEntry.builder(GRASS_BLADES))
+						.withCondition(InvertedLootCondition.builder(MatchToolLootCondition.builder(ItemPredicate.Builder.create().item(Items.SHEARS))));
+
+				supplier.withPool(builder);
+			} else if (id.equals(new Identifier("minecraft", "blocks/vine"))) {
+				FabricLootPoolBuilder builder = FabricLootPoolBuilder.builder()
+						.withRolls(UniformLootTableRange.between(0, 2))
+						.withEntry(ItemEntry.builder(VINE_BUNDLE))
+						.withCondition(InvertedLootCondition.builder(MatchToolLootCondition.builder(ItemPredicate.Builder.create().item(Items.SHEARS))));
 
 				supplier.withPool(builder);
 			}
