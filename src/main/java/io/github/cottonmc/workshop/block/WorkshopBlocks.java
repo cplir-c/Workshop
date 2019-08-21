@@ -2,14 +2,14 @@ package io.github.cottonmc.workshop.block;
 
 import java.lang.reflect.Field;
 
+import io.github.cottonmc.workshop.Workshop;
+import io.github.cottonmc.workshop.item.WorkshopItems;
 import net.fabricmc.fabric.api.block.FabricBlockSettings;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
 import net.minecraft.block.MaterialColor;
 import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
@@ -32,17 +32,20 @@ public abstract class WorkshopBlocks {
     public static final Block ENCHANTED_ANVIL = new Block(Block.Settings.copy(METAL_ANVIL));
     
     public static void init() {
-    	Field[] blocks = WorkshopBlocks.class.getFields();
-    	Item.Settings craftingTableGroup = new Item.Settings().group(Items.CRAFTING_TABLE.getGroup());
-    	try {
-    		for (Field block_field:blocks) {
-    			Identifier id = new Identifier("workshop",block_field.getName().toLowerCase());
-    			Block block = (Block) block_field.get(null);
-    			
-	    		Registry.<Block>register(Registry.BLOCK, id, block);
-	    		Registry.<Item>register(Registry.ITEM, id, 
-	    			new BlockItem(block, craftingTableGroup));
-	    	}
-    	} catch (IllegalAccessException iae) {System.exit(-1);}
+    	register("mold_table", MOLD_TABLE);
+    	
+    	register("wood_cutting_table", WOOD_CUTTING_TABLE);
+    	register("tanning_cauldron", TANNING_CAULDRON);
+    	register("tool_furnace", TOOL_FURNACE);
+    	register("metal_anvil", METAL_ANVIL);
+    	
+    	register("enchanted_furnace", ENCHANTED_FURNACE);
+    	register("enchanted_anvil", ENCHANTED_ANVIL);
+    }
+    
+    public static Block register(String name, Block block) {
+    	block = Registry.<Block>register(Registry.BLOCK, new Identifier(Workshop.MODID, name), block);
+    	WorkshopItems.register(name, new BlockItem(block, WorkshopItems.defaultSettings()));
+		return block;
     }
 }
