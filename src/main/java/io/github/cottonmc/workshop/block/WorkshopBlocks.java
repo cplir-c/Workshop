@@ -1,7 +1,5 @@
 package io.github.cottonmc.workshop.block;
 
-import java.lang.reflect.Field;
-
 import io.github.cottonmc.workshop.Workshop;
 import io.github.cottonmc.workshop.item.WorkshopItems;
 import net.fabricmc.fabric.api.block.FabricBlockSettings;
