@@ -1,8 +1,7 @@
 {
-    "parent": "block/cube",
     "textures": {
-    	"particle":"block/tool_furnace",
-        "sides":"block/tool_furnace",
+    	"particle":"workshop:block/tool_furnace",
+        "sides":"workshop:block/tool_furnace",
         "down":"block/smooth_stone",
         "up":"block/cobblestone"
     },
