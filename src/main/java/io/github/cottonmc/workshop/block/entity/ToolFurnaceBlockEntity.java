@@ -1,16 +1,9 @@
 package io.github.cottonmc.workshop.block.entity;
 
-import java.util.Arrays;
-import java.util.List;
-
-import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.LockableContainerBlockEntity;
 import net.minecraft.container.Container;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Recipe;
@@ -26,16 +19,18 @@ public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity impleme
 	protected int burnTime;
 	protected int meltTime;
 	
-	protected ToolFurnaceBlockEntity(BlockEntityType<?> blockEntityType_1) {
-		super(blockEntityType_1);
-		slots = new ItemStack[]{ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY};
+	public ToolFurnaceBlockEntity() {
+		super(WorkshopBlockEntities.TOOL_FURNACE);
+		slots = new ItemStack[INV_SIZE];
+		this.clear();
 	}
 
 	protected ItemStack[] slots;
-
+	public static final int INV_SIZE = 5;
+	
 	@Override
 	public int getInvSize() {
-		return 3;
+		return INV_SIZE;
 	}
 
 	@Override
@@ -55,11 +50,16 @@ public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity impleme
 	@Override
 	public ItemStack takeInvStack(int j, int k) {
 		if(j > k)
-			throw new AssertionError();
-		int i = j;
-		for (; i < k; i++)
-			if(!slots[i].isEmpty())
-				return removeInvStack(i);
+			throw new AssertionError("Either you're using this wrong, or I guessed this method wrong.");
+		
+		ItemStack stack;
+		for (int i = j; i < k; i++) {
+			stack = slots[i];
+			if(!stack.isEmpty()) {
+				slots[i] = ItemStack.EMPTY;
+				return stack;
+			}
+		}
 		return ItemStack.EMPTY;
 	}
 
@@ -82,13 +82,25 @@ public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity impleme
 
 	@Override
 	public void clear() {
-		for(int i = 0; i < 3; i++)
+		for(int i = 0; i < INV_SIZE; i++)
 			slots[i] = ItemStack.EMPTY;
 	}
 
 	@Override
 	public void tick() {
+		if(burnTime <= 0)
+			return;
+		burnTime--;
 		
+		if(meltTime <= 0)
+			return;
+		
+		if (--meltTime <= 0)
+			outputRecipeResult();
+	}
+
+	private void outputRecipeResult() {
+		// TODO Auto-generated method stub
 	}
 
 	@Override
@@ -116,25 +128,24 @@ public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity impleme
 	}
 
 	@Override
-	public boolean canInsertInvStack(int var1, ItemStack var2, Direction var3) {
+	public boolean canInsertInvStack(int i, ItemStack var2, Direction var3) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean canExtractInvStack(int var1, ItemStack var2, Direction var3) {
+	public boolean canExtractInvStack(int i, ItemStack var2, Direction var3) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	protected Text getContainerName() {
-		// TODO Auto-generated method stub
-		return null;
+		return new TranslatableText("Tool Furnace");
 	}
 
 	@Override
-	protected Container createContainer(int var1, PlayerInventory var2) {
+	protected Container createContainer(int i, PlayerInventory var2) {
 		// TODO Auto-generated method stub
 		return null;
 	}

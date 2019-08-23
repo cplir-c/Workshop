@@ -2,13 +2,14 @@ package io.github.cottonmc.workshop.block;
 
 import net.minecraft.block.AbstractFurnaceBlock;
 import net.minecraft.block.Block;
-import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import io.github.cottonmc.workshop.block.entity.ToolFurnaceBlockEntity;
+
 
 public class ToolFurnaceBlock extends AbstractFurnaceBlock {
 
