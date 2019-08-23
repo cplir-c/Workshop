@@ -11,26 +11,21 @@ import net.minecraft.block.BlockWithEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
-public abstract class WorkshopBlockEntities {
-	private WorkshopBlockEntities() {}
+public class WorkshopBlockEntities {
+
+	public static BlockEntityType<ToolFurnaceBlockEntity> TOOL_FURNACE;
 	
-	public static final BlockEntityType<ToolFurnaceBlockEntity> TOOL_FURNACE;
-	
-	protected static <T extends BlockEntity> BlockEntityType<T> createBlockEntityType(Supplier<T> tConstructor, Block blockWithEntity){
-		if (blockWithEntity == null || tConstructor == null)
-			throw new NullPointerException();
+	protected static <T extends BlockEntity> BlockEntityType<T> register(String name, Supplier<T> tConstructor, Block... blocks){
 		
-		BlockEntityType.Builder<T> builder = BlockEntityType.Builder.<T>create(tConstructor, blockWithEntity);
-		BlockEntityType<T> entityType = builder.build(null);
+		BlockEntityType.Builder<T> builder = BlockEntityType.Builder.create(tConstructor, blocks);
+		BlockEntityType<T> type = builder.build(null);
+
+		Registry.register(Registry.BLOCK_ENTITY, new Identifier(Workshop.MODID, name), type);
 		
-		return entityType;
-	}
-	
-	static {
-		TOOL_FURNACE = WorkshopBlockEntities.<ToolFurnaceBlockEntity>createBlockEntityType(ToolFurnaceBlockEntity::new, WorkshopBlocks.TOOL_FURNACE);
+		return type;
 	}
 	
 	public static void init() {
-		Registry.register(Registry.BLOCK_ENTITY, new Identifier(Workshop.MODID, "tool_furnace"), TOOL_FURNACE);
+		TOOL_FURNACE = WorkshopBlockEntities.register("tool_furnace", ToolFurnaceBlockEntity::new, WorkshopBlocks.TOOL_FURNACE);
 	}
 }

@@ -3,15 +3,18 @@ package io.github.cottonmc.workshop.block;
 import io.github.cottonmc.workshop.Workshop;
 import io.github.cottonmc.workshop.block.entity.WorkshopBlockEntities;
 import io.github.cottonmc.workshop.item.WorkshopItems;
+import net.fabricmc.fabric.api.block.FabricBlockSettings;
+import net.fabricmc.fabric.api.tag.FabricItemTags;
+import net.fabricmc.fabric.api.tools.FabricToolTags;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.Material;
 import net.minecraft.item.BlockItem;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
-public abstract class WorkshopBlocks {
-    private WorkshopBlocks() {}
-    
+public class WorkshopBlocks {
+
     /** This block is for making molds. */
     //public static final Block MOLD_TABLE = new Block(
     //		FabricBlockSettings.of(Material.WOOD, MaterialColor.BROWN)
@@ -19,7 +22,7 @@ public abstract class WorkshopBlocks {
     
     /** These blocks are for crafting tool parts and materials. */
     //public static final Block WOOD_CUTTING_TABLE = new Block(Block.Settings.copy(MOLD_TABLE));
-    public static final Block TOOL_FURNACE = new ToolFurnaceBlock(Block.Settings.copy(Blocks.FURNACE));
+    public static final Block TOOL_FURNACE = new ToolFurnaceBlock(FabricBlockSettings.of(Material.STONE).breakByTool(FabricToolTags.PICKAXES).build());
     //public static final Block TANNING_CAULDRON = new Block(Block.Settings.copy(Blocks.CAULDRON));
     //public static final Block METAL_ANVIL = new Block(Block.Settings.copy(Blocks.ANVIL));
     
@@ -37,12 +40,10 @@ public abstract class WorkshopBlocks {
     	
     	register("enchanted_furnace", ENCHANTED_FURNACE);
     	register("enchanted_anvil", ENCHANTED_ANVIL);*/
-    	
-    	WorkshopBlockEntities.init();
     }
     
     public static Block register(String name, Block block) {
-    	block = Registry.<Block>register(Registry.BLOCK, new Identifier(Workshop.MODID, name), block);
+    	Registry.register(Registry.BLOCK, new Identifier(Workshop.MODID, name), block);
     	WorkshopItems.register(name, new BlockItem(block, WorkshopItems.defaultSettings()));
 		return block;
     }
