@@ -4,7 +4,6 @@ import java.util.function.Supplier;
 
 import io.github.cottonmc.workshop.block.WorkshopBlocks;
 import io.github.cottonmc.workshop.Workshop;
-import io.github.cottonmc.workshop.block.ToolFurnaceBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.Block;

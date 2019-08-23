@@ -21,7 +21,7 @@ public abstract class WorkshopBlocks {
     
     /** These blocks are for crafting tool parts and materials. */
     public static final Block WOOD_CUTTING_TABLE = new Block(Block.Settings.copy(MOLD_TABLE));
-    public static final Block TOOL_FURNACE = new Block(Block.Settings.copy(Blocks.FURNACE));
+    public static final Block TOOL_FURNACE = new ToolFurnaceBlock(Block.Settings.copy(Blocks.FURNACE));
     public static final Block TANNING_CAULDRON = new Block(Block.Settings.copy(Blocks.CAULDRON));
     public static final Block METAL_ANVIL = new Block(Block.Settings.copy(Blocks.ANVIL));
     

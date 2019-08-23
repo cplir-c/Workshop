@@ -4,7 +4,7 @@
         "sides":"workshop:block/tool_furnace",
         "down":"block/smooth_stone",
         "up":"block/cobblestone",
-        "front":"block/furnace_on"
+        "front":"block/furnace_front_on"
     },
 	"elements":[
 		{
