@@ -16,19 +16,21 @@ public abstract class WorkshopBlockEntities {
 	
 	public static final BlockEntityType<ToolFurnaceBlockEntity> TOOL_FURNACE;
 	
-	protected static <T extends BlockEntity> BlockEntityType<T> createBlockEntityType(Supplier<T> tConstructor, String identifier, Block blockWithEntity){
-		if (blockWithEntity == null || identifier == null || tConstructor == null)
+	protected static <T extends BlockEntity> BlockEntityType<T> createBlockEntityType(Supplier<T> tConstructor, Block blockWithEntity){
+		if (blockWithEntity == null || tConstructor == null)
 			throw new NullPointerException();
-		if (!(blockWithEntity instanceof BlockWithEntity))
-			throw new IllegalArgumentException();
 		
 		BlockEntityType.Builder<T> builder = BlockEntityType.Builder.<T>create(tConstructor, blockWithEntity);
 		BlockEntityType<T> entityType = builder.build(null);
 		
-		return Registry.register(Registry.BLOCK_ENTITY, new Identifier(Workshop.MODID, identifier), entityType);
+		return entityType;
 	}
 	
 	static {
-		TOOL_FURNACE = WorkshopBlockEntities.<ToolFurnaceBlockEntity>createBlockEntityType(ToolFurnaceBlockEntity::new, "tool_furnace", WorkshopBlocks.TOOL_FURNACE);
+		TOOL_FURNACE = WorkshopBlockEntities.<ToolFurnaceBlockEntity>createBlockEntityType(ToolFurnaceBlockEntity::new, WorkshopBlocks.TOOL_FURNACE);
+	}
+	
+	public static void init() {
+		Registry.register(Registry.BLOCK_ENTITY, new Identifier(Workshop.MODID, "tool_furnace"), TOOL_FURNACE);
 	}
 }
