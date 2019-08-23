@@ -5,7 +5,7 @@ import io.github.cottonmc.workshop.item.WorkshopItems;
 import net.fabricmc.api.ModInitializer;
 
 public class Workshop implements ModInitializer {
-	public static String MODID = "workshop";
+	public static final String MODID = "workshop";
 
 	@Override
 	public void onInitialize() {
