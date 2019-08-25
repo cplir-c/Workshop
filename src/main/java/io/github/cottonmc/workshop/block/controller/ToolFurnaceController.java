@@ -4,11 +4,11 @@ import io.github.cottonmc.cotton.gui.CottonScreenController;
 import io.github.cottonmc.cotton.gui.widget.WGridPanel;
 import io.github.cottonmc.cotton.gui.widget.WItemSlot;
 import io.github.cottonmc.cotton.gui.widget.WLabel;
+import io.github.cottonmc.workshop.block.entity.ToolFurnaceBlockEntity;
 import net.minecraft.container.BlockContext;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.text.TranslatableText;
-import static io.github.cottonmc.workshop.block.entity.ToolFurnaceBlockEntity.INV_SIZE;
 
 public class ToolFurnaceController extends CottonScreenController {
 	public static final RecipeType<?> TOOL_FURNACE = RecipeType.register("tool_furnace");
@@ -22,31 +22,24 @@ public class ToolFurnaceController extends CottonScreenController {
 						new TranslatableText("block.workshop.tool_furnace"),
 						WLabel.DEFAULT_TEXT_COLOR
 				), 0, 0);
+		WItemSlot inputSlot = WItemSlot.of(blockInventory, ToolFurnaceBlockEntity.INPUT);
+		WItemSlot fuelSlot = WItemSlot.of(blockInventory, ToolFurnaceBlockEntity.FUEL);
+		WItemSlot outputSlot = WItemSlot.of(blockInventory, ToolFurnaceBlockEntity.OUTPUT);
+		WItemSlot moldSlot = WItemSlot.of(blockInventory, ToolFurnaceBlockEntity.MOLD);
+		rootPanel.add(inputSlot, 0, 0);
+		//rootPanel.add(burnTimeSprite, 0, 1);
+		rootPanel.add(fuelSlot, 0, 2);
+		rootPanel.add(outputSlot, 4, 1);
+		rootPanel.add(moldSlot, 2, 1);
 		
-		WItemSlot outputSlot = WItemSlot.of(blockInventory, INV_SIZE);
-		WItemSlot moldSlot = WItemSlot.of(blockInventory, INV_SIZE + 1);
-		rootPanel.add(outputSlot, 4, 2);
-		rootPanel.add(moldSlot, 6, 2);
-		
-		WItemSlot[] inputSlots = new WItemSlot[INV_SIZE];
-		double angle = 2*Math.PI/INV_SIZE;
-		for(int i = 0; i < INV_SIZE; i++) {
-			inputSlots[i] = WItemSlot.of(blockInventory, i);
-			rootPanel.add(
-					inputSlots[i],
-					1 + ((int)(2 * Math.cos(i*angle))),
-					1 + ((int)(2 * Math.sin(i*angle))));
-		}
-		rootPanel.add(this.createPlayerInventoryPanel(), 0, 5);
-		
-		//rootPanel.add(WSprite);
+		rootPanel.add(this.createPlayerInventoryPanel(), 0, 3);
 		
 		rootPanel.validate(this);
 	}
 	
 	@Override
 	public int getCraftingResultSlotIndex() {
-		return INV_SIZE;
+		return ToolFurnaceBlockEntity.OUTPUT;
 	}
 
 }
