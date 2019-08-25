@@ -25,8 +25,8 @@ repositories {
       url "http://server.bbkr.space:8081/artifactory/libs-release/"
     }
 	maven {
-	  name = "Cotton (snapshots)"
-	  url = "http://server.bbkr.space:8081/artifactory/libs-snapshot/"
+	  name "Cotton (snapshots)"
+	  url "http://server.bbkr.space:8081/artifactory/libs-snapshot/"
 	}
 }
 
