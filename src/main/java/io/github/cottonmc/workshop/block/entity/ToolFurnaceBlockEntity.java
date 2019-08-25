@@ -223,6 +223,8 @@ public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity impleme
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	
 
 	@Override
 	public SidedInventory getInventory(BlockState state, IWorld world, BlockPos pos) {

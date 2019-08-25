@@ -4,7 +4,6 @@ import io.github.cottonmc.cotton.gui.CottonScreenController;
 import io.github.cottonmc.cotton.gui.widget.WGridPanel;
 import io.github.cottonmc.cotton.gui.widget.WItemSlot;
 import io.github.cottonmc.cotton.gui.widget.WLabel;
-import io.github.cottonmc.cotton.gui.widget.WSprite;
 import net.minecraft.container.BlockContext;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.recipe.RecipeType;
