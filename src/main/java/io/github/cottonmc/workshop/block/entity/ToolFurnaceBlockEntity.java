@@ -34,7 +34,7 @@ public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity impleme
 	protected ItemStack mold;
 	protected ItemStack[] slots;
 	//the rest are inputs
-	public static final int INV_SIZE = 3;
+	public static final int INV_SIZE = 1;
 	
 	@Override
 	public int getInvSize() {
@@ -223,6 +223,8 @@ public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity impleme
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	
 
 	@Override
 	public SidedInventory getInventory(BlockState state, IWorld world, BlockPos pos) {
