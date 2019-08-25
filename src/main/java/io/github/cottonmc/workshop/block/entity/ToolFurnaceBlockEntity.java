@@ -1,12 +1,13 @@
 package io.github.cottonmc.workshop.block.entity;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.InventoryProvider;
-import net.minecraft.block.entity.LockableContainerBlockEntity;
+import io.github.cottonmc.workshop.block.controller.ToolFurnaceController;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.container.BlockContext;
 import net.minecraft.container.Container;
 import net.minecraft.container.NameableContainerProvider;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Recipe;
@@ -15,26 +16,33 @@ import net.minecraft.recipe.RecipeInputProvider;
 import net.minecraft.recipe.RecipeUnlocker;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.DefaultedList;
+import net.minecraft.util.Nameable;
 import net.minecraft.util.Tickable;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.IWorld;
 
-public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity implements SidedInventory, RecipeUnlocker, RecipeInputProvider, Tickable, InventoryProvider, NameableContainerProvider {
-	protected int burnTime;
-	protected int meltTime;
+public class ToolFurnaceBlockEntity extends BlockEntity implements SidedInventory, RecipeUnlocker, RecipeInputProvider, Tickable, NameableContainerProvider, Inventory, Nameable {
+	
+	//Constants for clear access to specific slot types
+	public static final int INPUT = 0;
+	public static final int FUEL = INPUT + 1;
+	public static final int MOLD = FUEL + 1;
+	public static final int OUTPUT = MOLD + 1;
+	//Total size of the inventory
+	public static final int INV_SIZE = OUTPUT + 1;
 	
 	public ToolFurnaceBlockEntity() {
 		super(WorkshopBlockEntities.TOOL_FURNACE);
-		slots = new ItemStack[INV_SIZE];
-		this.clear();
+		this.slots = DefaultedList.ofSize(INV_SIZE, ItemStack.EMPTY);
+		this.burnTime = 0;
+		this.meltTime = 0;
+		this.lastRecipe = null;
 	}
 	
-	protected ItemStack output;
-	protected ItemStack mold;
-	protected ItemStack[] slots;
-	//the rest are inputs
-	public static final int INV_SIZE = 1;
+	protected DefaultedList<ItemStack> slots;
+	protected int burnTime;
+	protected int meltTime;
+	protected Recipe<ToolFurnaceBlockEntity> lastRecipe;
 	
 	@Override
 	public int getInvSize() {
@@ -43,52 +51,23 @@ public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity impleme
 
 	@Override
 	public boolean isInvEmpty() {
-		for (ItemStack stack:slots)
-			if(!stack.isEmpty())
-				return false;
-		
-		return true;
+		return this.slots.isEmpty();
 	}
 
 	@Override
 	public ItemStack getInvStack(int i) {
-		if(i >= INV_SIZE) {
-			i -= INV_SIZE;
-			if (i <= 0)
-				return output;
-			else if (i == 1)
-				return mold;
-		}
-		return slots[i];
+		return this.slots.get(i);
 	}
 
 	@Override
-	public ItemStack takeInvStack(int j, int k) {
-		if(j > k)
-			throw new AssertionError("Either you're using this wrong, or I guessed this method wrong.");
+	public ItemStack takeInvStack(int slotIndex, int requestSize) {
+		ItemStack slotAtIndex = this.slots.get(slotIndex);
 		
-		ItemStack stack;
-		int bigK = -1;
-		if (k >= INV_SIZE) {
-			bigK = k;
-			k = INV_SIZE;
-		}
-		for (int i = j; i < k; i++) {
-			stack = slots[i];
-			if(!stack.isEmpty()) {
-				slots[i] = ItemStack.EMPTY;
-				return stack;
-			}
-		}
-		if (bigK > -1)
-			for (int i = k; i < k; i++) {
-				stack = getInvStack(i);
-				if (!stack.isEmpty()) {
-					setInvStack(i, ItemStack.EMPTY);
-					return stack;
-				}
-			}
+		int internalSize = slotAtIndex.getCount();
 		
+		if(internalSize >= requestSize) {
+			return slotAtIndex.split(requestSize);
+		}
 		return ItemStack.EMPTY;
 	}
 
@@ -101,27 +80,18 @@ public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity impleme
 
 	@Override
 	public void setInvStack(int i, ItemStack stack) {
-		if(i >= INV_SIZE) {
-			i -= INV_SIZE;
-			if (i <= 0)
-				output = stack;
-			else if (i == 1)
-				mold = stack;
-		}
-		slots[i] = stack;
+		this.slots.set(i, stack);
 	}
 
 	@Override
 	public boolean canPlayerUseInv(PlayerEntity var1) {
-		return true; //NotImplemented
+		return true;
 	}
 
 	@Override
 	public void clear() {
-		for(int i = 0; i < INV_SIZE; i++)
-			slots[i] = ItemStack.EMPTY;
-		output = ItemStack.EMPTY;
-		mold = ItemStack.EMPTY;
+		for (int i = 0; i < INV_SIZE; i++)
+			this.slots.set(i, ItemStack.EMPTY);
 	}
 
 	@Override
@@ -142,92 +112,87 @@ public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity impleme
 	}
 
 	@Override
-	public void provideRecipeInputs(RecipeFinder var1) {
-		// TODO Auto-generated method stub
-		
+	public void provideRecipeInputs(RecipeFinder finder) {
+		finder.addItem(this.slots.get(INPUT));
+		finder.addItem(this.slots.get(MOLD));
 	}
 
 	@Override
 	public void setLastRecipe(Recipe<?> var1) {
-		// TODO Auto-generated method stub
-		
+		if (this.lastRecipe == null || !this.lastRecipe.equals(var1))
+			this.lastRecipe = (Recipe<ToolFurnaceBlockEntity>) var1;
 	}
 
 	@Override
 	public Recipe<?> getLastRecipe() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.lastRecipe;
 	}
 
 	@Override
 	public int[] getInvAvailableSlots(Direction var1) {
 		if(var1 == Direction.DOWN)
-			return new int[] {INV_SIZE + 1};
+			return new int[] {OUTPUT};
 		
 		if(var1 == Direction.UP)
-			return new int[] {INV_SIZE};
+			return new int[] {INPUT};
 		
-		int[] slots = new int[INV_SIZE];
-		for (int i = 0; i < INV_SIZE; i++)
-			slots[i] = i;
-		
-		return slots;
+		return new int[] {FUEL, MOLD};
 	}
-
+	
+	public static boolean canAccessSide(int i, Direction dir) {
+		if(dir == Direction.DOWN) {
+			if (i != OUTPUT)
+				return false;
+		} else if(dir == Direction.UP) {
+			if (i != INPUT)
+				return false; // No inserting into random slots, this is sided
+		} else {
+			if (i != MOLD && i != FUEL)
+				return false;
+		}
+		return true;
+	}
+	
 	@Override
 	public boolean canInsertInvStack(int i, ItemStack var2, Direction var3) {
-		if(var3 == Direction.DOWN)
+		//Check i
+		if (!canAccessSide(i, var3))
 			return false;
-		
-		if(var3 == Direction.UP){
-			for(ItemStack stack:slots)
-				if(stack.isEmpty())
-					return true;
-			
-			for(ItemStack stack:slots)
-				if(stack.isStackable() && stack.isItemEqual(var2)
-				  && (stack.getMaxCount() - stack.getCount()) < var2.getCount())
-					return true;
-			
-			return false;
-		}
-		
-		// var3 is a side
-		return mold.isEmpty() || ( mold.isStackable() && mold.isItemEqual(var2)
-			&& (mold.getMaxCount() - mold.getCount()) < var2.getCount());
+		// Check if the new itemStack can fit on the internal one
+		ItemStack internalSlot = this.slots.get(i);
+		return internalSlot.isEmpty()
+			|| (
+					internalSlot.isStackable()
+					&& internalSlot.isItemEqual(var2)
+					&& (internalSlot.getCount() + var2.getCount()) < internalSlot.getMaxCount()
+			);
 	}
 
 	@Override
 	public boolean canExtractInvStack(int i, ItemStack var2, Direction var3) {
-		if (var3 == Direction.DOWN)
-			return !output.isEmpty() && var2.equals(output);
-		
-		if (var3 == Direction.UP) {
-			for (ItemStack slot:slots)
-				if(!slot.isEmpty() && var2.equals(slot))
-					return true;
-			
+		if(!canAccessSide(i, var3))
 			return false;
-		}
-			
-		return !mold.isEmpty() && var2.equals(mold);
+		
+		ItemStack internalSlot = this.slots.get(i);
+		return var2.isEmpty()
+			|| (
+				var2.isItemEqual(internalSlot)
+				&& var2.getCount() <= internalSlot.getCount()
+			);
 	}
 
 	@Override
-	protected Text getContainerName() {
+	public Container createMenu(int var1, PlayerInventory var2, PlayerEntity var3) {
+		return new ToolFurnaceController(var1, var2, (BlockContext) this);
+	}
+
+	@Override
+	public Text getName() {
 		return new TranslatableText("Tool Furnace");
 	}
 
 	@Override
-	protected Container createContainer(int i, PlayerInventory var2) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	
-
-	@Override
-	public SidedInventory getInventory(BlockState state, IWorld world, BlockPos pos) {
-		return (SidedInventory) world.getBlockEntity(pos);
+	public Text getDisplayName() {
+		return getName();
 	}
 }

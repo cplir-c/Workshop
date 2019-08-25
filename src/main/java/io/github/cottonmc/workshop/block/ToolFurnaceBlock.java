@@ -5,6 +5,7 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.EntityContext;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateFactory;
 import net.minecraft.state.property.DirectionProperty;
@@ -17,13 +18,14 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import io.github.cottonmc.workshop.Workshop;
 import io.github.cottonmc.workshop.block.entity.ToolFurnaceBlockEntity;
 import io.github.cottonmc.workshop.block.entity.WorkshopBlockEntities;
 
 
-public class ToolFurnaceBlock extends Block implements BlockEntityProvider {
+public class ToolFurnaceBlock extends Block implements BlockEntityProvider, InventoryProvider {
 	public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
 	protected static VoxelShape collisionShape = createShape();
 	
@@ -99,17 +101,21 @@ public class ToolFurnaceBlock extends Block implements BlockEntityProvider {
 	
 	@Override
 	public boolean activate(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hitResult) {
-		if (world.isClient) return true;
-		
-		BlockEntity be = world.getBlockEntity(pos);
-		if (be!=null && be instanceof ToolFurnaceBlockEntity) {
-			ContainerProviderRegistry.INSTANCE.openContainer(
-					new Identifier(Workshop.MODID,WorkshopBlockEntities.TOOL_FURNACE_ID),
-					player, (buf)->{
-				buf.writeBlockPos(pos);
-			});
+		if (!world.isClient) {
+			BlockEntity be = world.getBlockEntity(pos);
+			if (be instanceof ToolFurnaceBlockEntity) {
+				ContainerProviderRegistry.INSTANCE.openContainer(
+						new Identifier(Workshop.MODID,WorkshopBlockEntities.TOOL_FURNACE_ID),
+						player, (buf)->{
+					buf.writeBlockPos(pos);
+				});
+			}
 		}
-		
 		return true;
+	}
+
+	@Override
+	public SidedInventory getInventory(BlockState var1, IWorld var2, BlockPos var3) {
+		return (SidedInventory)var2.getBlockEntity(var3);
 	}
 }
