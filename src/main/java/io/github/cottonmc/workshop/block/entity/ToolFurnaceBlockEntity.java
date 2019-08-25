@@ -1,7 +1,10 @@
 package io.github.cottonmc.workshop.block.entity;
 
+import net.minecraft.block.BlockState;
+import net.minecraft.block.InventoryProvider;
 import net.minecraft.block.entity.LockableContainerBlockEntity;
 import net.minecraft.container.Container;
+import net.minecraft.container.NameableContainerProvider;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.SidedInventory;
@@ -13,9 +16,11 @@ import net.minecraft.recipe.RecipeUnlocker;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Tickable;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.IWorld;
 
-public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity implements SidedInventory, RecipeUnlocker, RecipeInputProvider, Tickable {
+public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity implements SidedInventory, RecipeUnlocker, RecipeInputProvider, Tickable, InventoryProvider, NameableContainerProvider {
 	protected int burnTime;
 	protected int meltTime;
 	
@@ -24,9 +29,12 @@ public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity impleme
 		slots = new ItemStack[INV_SIZE];
 		this.clear();
 	}
-
+	
+	protected ItemStack output;
+	protected ItemStack mold;
 	protected ItemStack[] slots;
-	public static final int INV_SIZE = 5;
+	//the rest are inputs
+	public static final int INV_SIZE = 3;
 	
 	@Override
 	public int getInvSize() {
@@ -44,6 +52,13 @@ public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity impleme
 
 	@Override
 	public ItemStack getInvStack(int i) {
+		if(i >= INV_SIZE) {
+			i -= INV_SIZE;
+			if (i <= 0)
+				return output;
+			else if (i == 1)
+				return mold;
+		}
 		return slots[i];
 	}
 
@@ -53,6 +68,11 @@ public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity impleme
 			throw new AssertionError("Either you're using this wrong, or I guessed this method wrong.");
 		
 		ItemStack stack;
+		int bigK = -1;
+		if (k >= INV_SIZE) {
+			bigK = k;
+			k = INV_SIZE;
+		}
 		for (int i = j; i < k; i++) {
 			stack = slots[i];
 			if(!stack.isEmpty()) {
@@ -60,30 +80,48 @@ public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity impleme
 				return stack;
 			}
 		}
+		if (bigK > -1)
+			for (int i = k; i < k; i++) {
+				stack = getInvStack(i);
+				if (!stack.isEmpty()) {
+					setInvStack(i, ItemStack.EMPTY);
+					return stack;
+				}
+			}
+		
 		return ItemStack.EMPTY;
 	}
 
 	@Override
 	public ItemStack removeInvStack(int i) {
-		ItemStack found = slots[i];
-		slots[i] = ItemStack.EMPTY;
+		ItemStack found = getInvStack(i);
+		setInvStack(i, ItemStack.EMPTY);
 		return found;
 	}
 
 	@Override
 	public void setInvStack(int i, ItemStack stack) {
+		if(i >= INV_SIZE) {
+			i -= INV_SIZE;
+			if (i <= 0)
+				output = stack;
+			else if (i == 1)
+				mold = stack;
+		}
 		slots[i] = stack;
 	}
 
 	@Override
 	public boolean canPlayerUseInv(PlayerEntity var1) {
-		return false; //NotImplemented
+		return true; //NotImplemented
 	}
 
 	@Override
 	public void clear() {
 		for(int i = 0; i < INV_SIZE; i++)
 			slots[i] = ItemStack.EMPTY;
+		output = ItemStack.EMPTY;
+		mold = ItemStack.EMPTY;
 	}
 
 	@Override
@@ -123,20 +161,56 @@ public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity impleme
 
 	@Override
 	public int[] getInvAvailableSlots(Direction var1) {
-		// TODO Auto-generated method stub
-		return null;
+		if(var1 == Direction.DOWN)
+			return new int[] {INV_SIZE + 1};
+		
+		if(var1 == Direction.UP)
+			return new int[] {INV_SIZE};
+		
+		int[] slots = new int[INV_SIZE];
+		for (int i = 0; i < INV_SIZE; i++)
+			slots[i] = i;
+		
+		return slots;
 	}
 
 	@Override
 	public boolean canInsertInvStack(int i, ItemStack var2, Direction var3) {
-		// TODO Auto-generated method stub
-		return false;
+		if(var3 == Direction.DOWN)
+			return false;
+		
+		if(var3 == Direction.UP){
+			for(ItemStack stack:slots)
+				if(stack.isEmpty())
+					return true;
+			
+			for(ItemStack stack:slots)
+				if(stack.isStackable() && stack.isItemEqual(var2)
+				  && (stack.getMaxCount() - stack.getCount()) < var2.getCount())
+					return true;
+			
+			return false;
+		}
+		
+		// var3 is a side
+		return mold.isEmpty() || ( mold.isStackable() && mold.isItemEqual(var2)
+			&& (mold.getMaxCount() - mold.getCount()) < var2.getCount());
 	}
 
 	@Override
 	public boolean canExtractInvStack(int i, ItemStack var2, Direction var3) {
-		// TODO Auto-generated method stub
-		return false;
+		if (var3 == Direction.DOWN)
+			return !output.isEmpty() && var2.equals(output);
+		
+		if (var3 == Direction.UP) {
+			for (ItemStack slot:slots)
+				if(!slot.isEmpty() && var2.equals(slot))
+					return true;
+			
+			return false;
+		}
+			
+		return !mold.isEmpty() && var2.equals(mold);
 	}
 
 	@Override
@@ -148,5 +222,10 @@ public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity impleme
 	protected Container createContainer(int i, PlayerInventory var2) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public SidedInventory getInventory(BlockState state, IWorld world, BlockPos pos) {
+		return (SidedInventory) world.getBlockEntity(pos);
 	}
 }

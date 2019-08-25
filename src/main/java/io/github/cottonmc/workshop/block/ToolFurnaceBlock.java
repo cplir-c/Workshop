@@ -13,8 +13,6 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 
-import java.util.Arrays;
-
 import io.github.cottonmc.workshop.block.entity.ToolFurnaceBlockEntity;
 
 
