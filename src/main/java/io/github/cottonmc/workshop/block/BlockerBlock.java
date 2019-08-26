@@ -8,6 +8,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.entity.EntityContext;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -45,7 +46,14 @@ public class BlockerBlock extends Block {
 	}
 
 	@Override
-	public void onBroken(IWorld world, BlockPos pos, BlockState state) {
-		world.breakBlock(pos.down(), true);
+	public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+		//TODO: support for more locations
+		world.breakBlock(pos.down(), !player.isCreative());
+	}
+
+	@Override
+	public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
+		//TODO: support for more locations
+		return world.getBlockState(pos.down()).getBlock().getPickStack(world, pos.down(), state);
 	}
 }

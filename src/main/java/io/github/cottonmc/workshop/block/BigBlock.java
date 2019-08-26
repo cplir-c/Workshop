@@ -2,6 +2,7 @@ package io.github.cottonmc.workshop.block;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -52,5 +53,10 @@ public abstract class BigBlock extends Block {
 			if (!world.getBlockState(blocker).getMaterial().isReplaceable()) return false;
 		}
 		return true;
+	}
+
+	@Override
+	public PistonBehavior getPistonBehavior(BlockState state) {
+		return PistonBehavior.BLOCK;
 	}
 }
