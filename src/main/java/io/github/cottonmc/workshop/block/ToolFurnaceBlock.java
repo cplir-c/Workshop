@@ -120,21 +120,4 @@ public class ToolFurnaceBlock extends Block implements BlockEntityProvider, Inve
 	public SidedInventory getInventory(BlockState state, IWorld world, BlockPos pos) {
 		return (SidedInventory)world.getBlockEntity(pos);
 	}
-
-	@Override
-	public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState newState, boolean boolean_1) {
-		super.onBlockAdded(state, world, pos, newState, boolean_1);
-		world.setBlockState(pos.up(), WorkshopBlocks.BLOCKER.getDefaultState());
-	}
-
-	@Override
-	public void onBlockRemoved(BlockState state, World world, BlockPos pos, BlockState newState, boolean boolean_1) {
-		super.onBlockRemoved(state, world, pos, newState, boolean_1);
-		world.breakBlock(pos.up(), false);
-	}
-
-	@Override
-	public boolean canPlaceAt(BlockState state, ViewableWorld world, BlockPos pos) {
-		return world.getBlockState(pos.up()).isAir();
-	}
 }

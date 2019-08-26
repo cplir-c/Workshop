@@ -27,7 +27,7 @@
     ]
   },
   "mixins": [
-    "workshop.mixins.json"
+    "mixins.workshop.json"
   ],
 
   "depends": {
