@@ -1,7 +1,10 @@
 package io.github.cottonmc.workshop.block.entity;
 
+import io.github.cottonmc.workshop.block.WorkshopBlocks;
 import io.github.cottonmc.workshop.block.controller.ToolFurnaceController;
+import io.github.cottonmc.workshop.recipe.ToolFurnaceRecipe;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.LockableContainerBlockEntity;
 import net.minecraft.container.BlockContext;
 import net.minecraft.container.Container;
 import net.minecraft.container.NameableContainerProvider;
@@ -21,7 +24,7 @@ import net.minecraft.util.Nameable;
 import net.minecraft.util.Tickable;
 import net.minecraft.util.math.Direction;
 
-public class ToolFurnaceBlockEntity extends BlockEntity implements SidedInventory, RecipeUnlocker, RecipeInputProvider, Tickable, NameableContainerProvider, Inventory, Nameable {
+public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity implements SidedInventory, RecipeUnlocker, RecipeInputProvider, Tickable {
 	
 	//Constants for clear access to specific slot types
 	public static final int INPUT = 0;
@@ -30,9 +33,9 @@ public class ToolFurnaceBlockEntity extends BlockEntity implements SidedInventor
 	public static final int OUTPUT = MOLD + 1;
 	//Total size of the inventory
 	public static final int INV_SIZE = OUTPUT + 1;
-	
+
 	public ToolFurnaceBlockEntity() {
-		super(WorkshopBlockEntities.TOOL_FURNACE);
+		super(WorkshopBlocks.TOOL_FURNACE_BE);
 		this.slots = DefaultedList.ofSize(INV_SIZE, ItemStack.EMPTY);
 		this.burnTime = 0;
 		this.meltTime = 0;
@@ -42,7 +45,7 @@ public class ToolFurnaceBlockEntity extends BlockEntity implements SidedInventor
 	protected DefaultedList<ItemStack> slots;
 	protected int burnTime;
 	protected int meltTime;
-	protected Recipe<ToolFurnaceBlockEntity> lastRecipe;
+	protected ToolFurnaceRecipe lastRecipe;
 	
 	@Override
 	public int getInvSize() {
@@ -118,9 +121,9 @@ public class ToolFurnaceBlockEntity extends BlockEntity implements SidedInventor
 	}
 
 	@Override
-	public void setLastRecipe(Recipe<?> var1) {
-		if (this.lastRecipe == null || !this.lastRecipe.equals(var1))
-			this.lastRecipe = (Recipe<ToolFurnaceBlockEntity>) var1;
+	public void setLastRecipe(Recipe<?> recipe) {
+		if ((this.lastRecipe == null || !this.lastRecipe.equals(recipe)) && recipe instanceof ToolFurnaceRecipe)
+			this.lastRecipe = (ToolFurnaceRecipe) recipe;
 	}
 
 	@Override
@@ -182,17 +185,17 @@ public class ToolFurnaceBlockEntity extends BlockEntity implements SidedInventor
 	}
 
 	@Override
-	public Container createMenu(int var1, PlayerInventory var2, PlayerEntity var3) {
-		return new ToolFurnaceController(var1, var2, (BlockContext) this);
+	protected Text getContainerName() {
+		return null;
 	}
 
 	@Override
-	public Text getName() {
-		return new TranslatableText("Tool Furnace");
+	public Container createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
+		return new ToolFurnaceController(syncId, inv, BlockContext.create(world, pos));
 	}
 
 	@Override
-	public Text getDisplayName() {
-		return getName();
+	protected Container createContainer(int syncId, PlayerInventory player) {
+		return new ToolFurnaceController(syncId, player, BlockContext.create(world, pos));
 	}
 }

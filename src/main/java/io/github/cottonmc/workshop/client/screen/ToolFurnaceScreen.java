@@ -1,4 +1,4 @@
-package io.github.cottonmc.workshop.block.screen;
+package io.github.cottonmc.workshop.client.screen;
 
 import io.github.cottonmc.cotton.gui.client.CottonScreen;
 import io.github.cottonmc.workshop.block.controller.ToolFurnaceController;
