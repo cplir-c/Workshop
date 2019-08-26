@@ -41,12 +41,12 @@ public class WorkshopBlocks {
 	public static BlockEntityType<ToolFurnaceBlockEntity> TOOL_FURNACE_BE;
     
     public static void init() {
-    	BLOCKER = Registry.register(Registry.BLOCK, new Identifier(Workshop.MODID, "blocker"), new BlockerBlock(FabricBlockSettings.of(Material.STONE).noCollision().dropsNothing().build()));
+    	BLOCKER = Registry.register(Registry.BLOCK, new Identifier(Workshop.MODID, "blocker"), new BlockerBlock(FabricBlockSettings.of(Material.STONE).noCollision().dropsNothing().strength(3.5f, 3.5f).build()));
     	/*register("mold_table", MOLD_TABLE);
     	
     	register("wood_cutting_table", WOOD_CUTTING_TABLE);
     	register("tanning_cauldron", TANNING_CAULDRON);*/
-    	TOOL_FURNACE = register("tool_furnace", new ToolFurnaceBlock(FabricBlockSettings.of(Material.STONE).breakByTool(FabricToolTags.PICKAXES).build()));
+    	TOOL_FURNACE = register("tool_furnace", new ToolFurnaceBlock(FabricBlockSettings.of(Material.STONE).breakByTool(FabricToolTags.PICKAXES).strength(3.5f, 3.5f).build()));
     	/*register("metal_anvil", METAL_ANVIL);
     	
     	register("enchanted_furnace", ENCHANTED_FURNACE);

@@ -13,6 +13,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
 public class BlockerBlock extends Block {
@@ -41,5 +42,10 @@ public class BlockerBlock extends Block {
 		//TODO: support for more locations
 		BlockHitResult relocHit = new BlockHitResult(((HitPosGetter)hit).workshop_getPos(), hit.getSide(), hit.getBlockPos().down(), hit.method_17781());
 		return world.getBlockState(pos.down()).activate(world, player, hand, relocHit);
+	}
+
+	@Override
+	public void onBroken(IWorld world, BlockPos pos, BlockState state) {
+		world.breakBlock(pos.down(), true);
 	}
 }

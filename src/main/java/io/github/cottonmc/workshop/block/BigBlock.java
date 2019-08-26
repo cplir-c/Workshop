@@ -3,6 +3,8 @@ package io.github.cottonmc.workshop.block;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.ViewableWorld;
 import net.minecraft.world.World;
 
@@ -13,7 +15,9 @@ public abstract class BigBlock extends Block {
 	}
 
 	//TODO: support for more blocker locations
-	abstract BlockPos[] getBlockerPositions(BlockPos pos);
+	public abstract Vec3i[] getBlockerOffsets(Direction facing);
+
+	public abstract BlockerBlock getBlocker();
 
 	@Override
 	public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState newState, boolean boolean_1) {
@@ -32,6 +36,6 @@ public abstract class BigBlock extends Block {
 	@Override
 	public boolean canPlaceAt(BlockState state, ViewableWorld world, BlockPos pos) {
 		//TODO: support for more blocker locations
-		return world.getBlockState(pos.up()).isAir();
+		return world.getBlockState(pos.up()).getMaterial().isReplaceable();
 	}
 }
