@@ -20,7 +20,9 @@
     "item": "workshop:wood_pickaxe",
     "count": 1,
     "data": {
-      "Binding": "grass"
+      "Binding": "grass",
+      "HeadBinding": "$ i0.Binding",
+      "HandleBinding": "$ i2.Binding"
     }
   }
 }

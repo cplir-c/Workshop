@@ -11,6 +11,7 @@ public class ColorPalettes {
 
 	//metals
 	public static final int IRON = 0xc2c2c2;
+	public static final int GOLD = 0xFDF5FF;
 
 	//gems
 	public static final int DIAMOND = 0x40c2cf;
