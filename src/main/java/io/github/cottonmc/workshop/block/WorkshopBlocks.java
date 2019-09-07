@@ -4,6 +4,7 @@ import io.github.cottonmc.workshop.Workshop;
 import io.github.cottonmc.workshop.block.controller.ToolFurnaceController;
 import io.github.cottonmc.workshop.block.entity.ToolFurnaceBlockEntity;
 import io.github.cottonmc.workshop.item.WorkshopItems;
+import io.github.cottonmc.workshop.recipe.ToolFurnaceRecipe;
 import net.fabricmc.fabric.api.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.container.ContainerProviderRegistry;
 import net.fabricmc.fabric.api.tools.FabricToolTags;

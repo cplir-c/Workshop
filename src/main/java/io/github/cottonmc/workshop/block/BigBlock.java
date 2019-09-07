@@ -10,7 +10,6 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.ViewableWorld;
 import net.minecraft.world.World;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,14 +21,14 @@ public abstract class BigBlock extends Block {
 
 	public abstract Vec3i[] getBlockerOffsets();
 
-	@Nullable
+	//@Nullable
 	abstract EnumProperty<Direction> getFacingProperty();
 
 	public abstract Blocker getBlocker();
 
 	@Override
-	public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState newState, boolean boolean_1) {
-		super.onBlockAdded(state, world, pos, newState, boolean_1);
+	public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState newState, boolean bool) {
+		super.onBlockAdded(state, world, pos, newState, bool);
 		Direction dir = getFacingProperty() == null? Direction.NORTH : state.get(getFacingProperty());
 		for (Vec3i offset : getRotatedVectors(dir)) {
 			Vec3i opposite = new Vec3i(offset.getX() * -1, offset.getY() * -1, offset.getZ() * -1);
@@ -40,9 +39,9 @@ public abstract class BigBlock extends Block {
 	}
 
 	@Override
-	public void onBlockRemoved(BlockState state, World world, BlockPos pos, BlockState newState, boolean boolean_1) {
-		super.onBlockRemoved(state, world, pos, newState, boolean_1);
-		Direction dir = getFacingProperty() == null? Direction.NORTH : state.get(getFacingProperty());
+	public void onBlockRemoved(BlockState state, World world, BlockPos pos, BlockState newState, boolean bool) {
+		super.onBlockRemoved(state, world, pos, newState, bool);
+		Direction dir = (getFacingProperty() == null)? Direction.NORTH : state.get(getFacingProperty());
 		for (Vec3i offset : getRotatedVectors(dir)) {
 			BlockPos toRemove = pos.add(offset);
 			world.breakBlock(toRemove, false);
@@ -54,7 +53,8 @@ public abstract class BigBlock extends Block {
 		Direction dir = getFacingProperty() == null? Direction.NORTH : state.get(getFacingProperty());
 		for (Vec3i offset : getRotatedVectors(dir)) {
 			BlockPos blocker = pos.add(offset);
-			if (!world.getBlockState(blocker).getMaterial().isReplaceable()) return false;
+			if (!world.getBlockState(blocker).getMaterial().isReplaceable())
+				return false;
 		}
 		return true;
 	}
@@ -65,39 +65,52 @@ public abstract class BigBlock extends Block {
 	}
 
 	Vec3i[] getRotatedVectors(Direction dir) {
+		Vec3i[] blockerOffsets = getBlockerOffsets();
 		if (dir == Direction.NORTH) return getBlockerOffsets();
-		List<Vec3i> ret = new ArrayList<>();
+		List<Vec3i> ret = new ArrayList<>(blockerOffsets.length);
 		if (dir.getAxis() == Direction.Axis.Y) {
 			//rotate around the X axis
-			for (Vec3i vec : getBlockerOffsets()) {
+			for (Vec3i vec : blockerOffsets) {
 				int y = vec.getY();
 				int z = vec.getZ();
-				int angle = dir == Direction.UP? 90 : 270;
-
-				angle *= Math.PI/180.0; //Convert amount to radians
+				double angle = (dir == Direction.UP)? 90.0d : 270.0d;
+				//Angle is a double for storing the conversion to radians
+				angle = Math.toRadians(angle); //Convert amount to radians
 
 				double theta = Math.atan2(y, z);
-				double r = Math.sqrt(z*z+y*y);
+				double r = Math.hypot(z, y);
+				
+				theta -= angle;
 
-				z = (int)(r * Math.cos(theta-angle));
-				y = (int)(r * Math.sin(theta-angle));
+				z = (int)(r * Math.cos(theta));
+				y = (int)(r * Math.sin(theta));
 
 				ret.add(new Vec3i(vec.getX(), y, z));
 			}
 		} else {
 			//rotate around the Y axis
-			for (Vec3i vec : getBlockerOffsets()) {
+			for (Vec3i vec : blockerOffsets) {
 				int x = vec.getX();
 				int z = vec.getZ();
-				int angle = dir == Direction.EAST? 90 : dir == Direction.SOUTH? 180 : 270;
 
-				angle *= Math.PI/180.0; //Convert amount to radians
+				//Angle is a double so it can store the conversion to radians
+				double angle;
+				if(dir == Direction.EAST)
+					angle = 90.0d;
+				else if (dir == Direction.SOUTH)
+					angle = 180.0d;
+				// North was tested earlier
+				else//    Direction.WEST
+					angle = 270.0d;
+				angle = Math.toRadians(angle); //Convert amount to radians
 
 				double theta = Math.atan2(x, z);
-				double r = Math.sqrt(z*z+x*x);
+				double r = Math.hypot(z,x);
+				
+				theta -= angle;
 
-				z = (int)(r * Math.cos(theta-angle));
-				x = (int)(r * Math.sin(theta-angle));
+				z = (int)(r * Math.cos(theta));
+				x = (int)(r * Math.sin(theta));
 
 				ret.add(new Vec3i(x, vec.getY(), z));
 			}

@@ -3,26 +3,25 @@ package io.github.cottonmc.workshop.block.entity;
 import io.github.cottonmc.workshop.block.WorkshopBlocks;
 import io.github.cottonmc.workshop.block.controller.ToolFurnaceController;
 import io.github.cottonmc.workshop.recipe.ToolFurnaceRecipe;
-import net.minecraft.block.entity.BlockEntity;
+import io.github.cottonmc.workshop.recipe.WorkshopRecipes;
 import net.minecraft.block.entity.LockableContainerBlockEntity;
 import net.minecraft.container.BlockContext;
 import net.minecraft.container.Container;
-import net.minecraft.container.NameableContainerProvider;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeFinder;
 import net.minecraft.recipe.RecipeInputProvider;
+import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.RecipeUnlocker;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.DefaultedList;
-import net.minecraft.util.Nameable;
 import net.minecraft.util.Tickable;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.registry.Registry;
 
 public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity implements SidedInventory, RecipeUnlocker, RecipeInputProvider, Tickable {
 	
@@ -111,7 +110,15 @@ public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity impleme
 	}
 
 	private void outputRecipeResult() {
-		// TODO Auto-generated method stub
+		if (this.lastRecipe != null && this.lastRecipe.matches(this, world)) {
+			ItemStack result = this.lastRecipe.craft(this);
+			this.slots.set(INPUT, ItemStack.EMPTY);
+			this.slots.set(OUTPUT, result);
+		} else {
+			this.lastRecipe = this.world.getRecipeManager()
+					.getFirstMatch(WorkshopRecipes.TOOL_FURNACE, this, world)
+					.orElse(null);
+		}
 	}
 
 	@Override
@@ -144,16 +151,12 @@ public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity impleme
 	
 	public static boolean canAccessSide(int i, Direction dir) {
 		if(dir == Direction.DOWN) {
-			if (i != OUTPUT)
-				return false;
+			return i == OUTPUT;
 		} else if(dir == Direction.UP) {
-			if (i != INPUT)
-				return false; // No inserting into random slots, this is sided
+			return i == INPUT; // No inserting into random slots, this is sided
 		} else {
-			if (i != MOLD && i != FUEL)
-				return false;
+			return i == MOLD || i == FUEL;
 		}
-		return true;
 	}
 	
 	@Override
@@ -186,7 +189,7 @@ public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity impleme
 
 	@Override
 	protected Text getContainerName() {
-		return null;
+		return new TranslatableText("tool_furnace");
 	}
 
 	@Override
