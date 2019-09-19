@@ -8,11 +8,13 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 public class WorkshopRecipes {
+	private WorkshopRecipes() {}
 	public static RecipeType<ToolFurnaceRecipe> TOOL_FURNACE;
 	public static RecipeSerializer<ToolFurnaceRecipe> TOOL_FURNACE_RECIPE_SERIALIZER;
 
 	public static void init() {
 		TOOL_FURNACE = register("tool_furnace");
+		TOOL_FURNACE_RECIPE_SERIALIZER = register("tool_furnace", new ToolFurnaceRecipe.ToolFurnaceRecipeSerializer());
 	}
 
 	public static <T extends Recipe<?>> RecipeType<T> register(String id) {
@@ -21,7 +23,6 @@ public class WorkshopRecipes {
 				return id;
 			}
 		});
-		
 	}
 
 	public static <S extends RecipeSerializer<T>, T extends Recipe<?>> S register(String name, S serializer) {

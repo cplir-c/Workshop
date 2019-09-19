@@ -1,5 +1,7 @@
 package io.github.cottonmc.workshop.block.entity;
 
+import java.util.Objects;
+
 import io.github.cottonmc.workshop.block.WorkshopBlocks;
 import io.github.cottonmc.workshop.block.controller.ToolFurnaceController;
 import io.github.cottonmc.workshop.recipe.ToolFurnaceRecipe;
@@ -7,6 +9,7 @@ import io.github.cottonmc.workshop.recipe.WorkshopRecipes;
 import net.minecraft.block.entity.LockableContainerBlockEntity;
 import net.minecraft.container.BlockContext;
 import net.minecraft.container.Container;
+import net.minecraft.container.PropertyDelegate;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.SidedInventory;
@@ -23,8 +26,8 @@ import net.minecraft.util.Tickable;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.registry.Registry;
 
-public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity implements SidedInventory, RecipeUnlocker, RecipeInputProvider, Tickable {
-	
+public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity implements SidedInventory, RecipeUnlocker, RecipeInputProvider, Tickable, PropertyDelegate {
+	public static final int MAX_FUEL = 20/*ticks per item*/*90/*items per lava bucket*/;
 	//Constants for clear access to specific slot types
 	public static final int INPUT = 0;
 	public static final int FUEL = INPUT + 1;
@@ -32,6 +35,11 @@ public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity impleme
 	public static final int OUTPUT = MOLD + 1;
 	//Total size of the inventory
 	public static final int INV_SIZE = OUTPUT + 1;
+	
+	protected DefaultedList<ItemStack> slots;
+	protected int burnTime;
+	protected int meltTime;
+	protected ToolFurnaceRecipe lastRecipe;
 
 	public ToolFurnaceBlockEntity() {
 		super(WorkshopBlocks.TOOL_FURNACE_BE);
@@ -41,11 +49,6 @@ public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity impleme
 		this.lastRecipe = null;
 	}
 	
-	protected DefaultedList<ItemStack> slots;
-	protected int burnTime;
-	protected int meltTime;
-	protected ToolFurnaceRecipe lastRecipe;
-	
 	@Override
 	public int getInvSize() {
 		return INV_SIZE;
@@ -53,7 +56,12 @@ public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity impleme
 
 	@Override
 	public boolean isInvEmpty() {
-		return this.slots.isEmpty();
+		if (this.slots == null || this.slots.isEmpty())
+			return true;
+		for (ItemStack stack: this.slots)
+			if(!stack.isEmpty())
+				return false;
+		return true;
 	}
 
 	@Override
@@ -118,6 +126,7 @@ public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity impleme
 			this.lastRecipe = this.world.getRecipeManager()
 					.getFirstMatch(WorkshopRecipes.TOOL_FURNACE, this, world)
 					.orElse(null);
+			this.outputRecipeResult();
 		}
 	}
 
@@ -129,7 +138,7 @@ public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity impleme
 
 	@Override
 	public void setLastRecipe(Recipe<?> recipe) {
-		if ((this.lastRecipe == null || !this.lastRecipe.equals(recipe)) && recipe instanceof ToolFurnaceRecipe)
+		if ((!Objects.equals(this.lastRecipe, recipe)) && recipe instanceof ToolFurnaceRecipe)
 			this.lastRecipe = (ToolFurnaceRecipe) recipe;
 	}
 
@@ -150,13 +159,13 @@ public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity impleme
 	}
 	
 	public static boolean canAccessSide(int i, Direction dir) {
-		if(dir == Direction.DOWN) {
+		if(dir == Direction.DOWN)
 			return i == OUTPUT;
-		} else if(dir == Direction.UP) {
+		
+		if(dir == Direction.UP)
 			return i == INPUT; // No inserting into random slots, this is sided
-		} else {
-			return i == MOLD || i == FUEL;
-		}
+
+        return i == MOLD || i == FUEL;
 	}
 	
 	@Override
@@ -201,4 +210,35 @@ public class ToolFurnaceBlockEntity extends LockableContainerBlockEntity impleme
 	protected Container createContainer(int syncId, PlayerInventory player) {
 		return new ToolFurnaceController(syncId, player, BlockContext.create(world, pos));
 	}
+	
+	/*
+	public PropertyDelegate getPropertyDelegate() {
+		return new PropertyDelegate() {
+	//*/
+
+			@Override
+			public int get(int n) {
+				if (n == 0)
+					return ToolFurnaceBlockEntity.this.burnTime;
+				else
+					return ToolFurnaceBlockEntity.this.meltTime;
+			}
+
+			@Override
+			public void set(int n, int value) {
+				if (n == 0)
+					ToolFurnaceBlockEntity.this.burnTime = value;
+				else
+					ToolFurnaceBlockEntity.this.meltTime = value;
+			}
+
+			@Override
+			public int size() {
+				return 2;
+			}
+			
+	/*	
+	    }
+	}
+	//*/
 }
